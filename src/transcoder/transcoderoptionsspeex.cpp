@@ -30,7 +30,7 @@
 
 #include "transcoderoptionsinterface.h"
 #include "transcoderoptionsspeex.h"
-#include "ui_transcoderoptionsspeex.h"
+#include "transcoder/ui_transcoderoptionsspeex.h"
 
 #include "core/settings.h"
 

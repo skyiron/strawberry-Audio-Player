@@ -69,7 +69,7 @@
 #include "core/settings.h"
 #include "core/database.h"
 #include "core/networkaccessmanager.h"
-#include "core/songmimedata.h"
+#include "mimedata/songmimedata.h"
 #include "utilities/strutils.h"
 #include "utilities/fileutils.h"
 #include "utilities/imageutils.h"

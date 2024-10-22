@@ -31,7 +31,7 @@
 #include "streamingcollectionviewcontainer.h"
 #include "core/song.h"
 
-#include "ui_streamingtabsview.h"
+#include "streaming/ui_streamingtabsview.h"
 
 class QContextMenuEvent;
 

@@ -59,7 +59,7 @@
 #include "core/database.h"
 #include "core/iconloader.h"
 #include "core/settings.h"
-#include "core/songmimedata.h"
+#include "mimedata/songmimedata.h"
 #include "collectionfilteroptions.h"
 #include "collectionquery.h"
 #include "collectionbackend.h"

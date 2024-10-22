@@ -25,7 +25,7 @@
 
 #include "transcoderoptionsinterface.h"
 #include "transcoderoptionswavpack.h"
-#include "ui_transcoderoptionswavpack.h"
+#include "transcoder/ui_transcoderoptionswavpack.h"
 
 #include "core/settings.h"
 

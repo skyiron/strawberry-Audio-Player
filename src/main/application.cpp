@@ -44,7 +44,7 @@
 #include "core/database.h"
 #include "core/taskmanager.h"
 #include "core/networkaccessmanager.h"
-#include "core/player.h"
+#include "player/player.h"
 #include "tagreader/tagreaderclient.h"
 #include "engine/devicefinders.h"
 #include "core/urlhandlers.h"

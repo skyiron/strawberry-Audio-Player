@@ -23,7 +23,7 @@
 #define STREAMSONGMIMEDATA_H
 
 #include "includes/shared_ptr.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "core/song.h"
 
 class StreamingService;

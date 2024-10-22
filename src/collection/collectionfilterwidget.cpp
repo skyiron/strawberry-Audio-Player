@@ -53,7 +53,7 @@
 #include "savedgroupingmanager.h"
 #include "collectionfilterwidget.h"
 #include "groupbydialog.h"
-#include "ui_collectionfilterwidget.h"
+#include "collection/ui_collectionfilterwidget.h"
 #include "widgets/searchfield.h"
 #include "constants/collectionsettings.h"
 #include "constants/appearancesettings.h"

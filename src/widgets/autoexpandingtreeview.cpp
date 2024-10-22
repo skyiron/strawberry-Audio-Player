@@ -27,7 +27,7 @@
 #include <QtEvents>
 
 #include "autoexpandingtreeview.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 
 namespace {
 constexpr int kRowsToShow = 50;

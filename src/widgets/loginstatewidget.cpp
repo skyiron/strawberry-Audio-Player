@@ -19,7 +19,7 @@
 */
 
 #include "loginstatewidget.h"
-#include "ui_loginstatewidget.h"
+#include "widgets/ui_loginstatewidget.h"
 #include "core/iconloader.h"
 
 #include <utility>

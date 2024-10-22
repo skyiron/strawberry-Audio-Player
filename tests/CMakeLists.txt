@@ -46,7 +46,7 @@ target_link_libraries(test_main PRIVATE
   PkgConfig::GSTREAMER_BASE
   Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets
-  strawberry_lib
+  strawberry_core
 )
 
 add_library(test_gui_main STATIC EXCLUDE_FROM_ALL ${TEST-RESOURCE-SOURCES} src/main.cpp)
@@ -61,14 +61,22 @@ target_link_libraries(test_gui_main PRIVATE
   PkgConfig::GSTREAMER_BASE
   Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets
-  strawberry_lib
+  strawberry_core
 )
 set_target_properties(test_gui_main PROPERTIES COMPILE_DEFINITIONS GUI)
 
 # Given a file foo_test.cpp, creates a target foo_test and adds it to the test target.
-macro(add_test_file test_source gui_required)
-    get_filename_component(TEST_NAME ${test_source} NAME_WE)
-    add_executable(${TEST_NAME} EXCLUDE_FROM_ALL ${test_source})
+macro(add_test_file gui_required)
+
+    parse_arguments(ADD_TEST_FILE
+      "SOURCES;HEADERS;LIBRARIES"
+      ""
+      ${ARGN}
+    )
+
+    get_filename_component(TEST_NAME ${ADD_TEST_FILE_SOURCES} NAME_WE)
+
+    add_executable(${TEST_NAME} EXCLUDE_FROM_ALL ${ADD_TEST_FILE_SOURCES})
     target_include_directories(${TEST_NAME} PRIVATE
       ${CMAKE_BINARY_DIR}/src
       ${CMAKE_SOURCE_DIR}/src
@@ -84,6 +92,7 @@ macro(add_test_file test_source gui_required)
       Qt${QT_VERSION_MAJOR}::Sql
       Qt${QT_VERSION_MAJOR}::Test
       Qt${QT_VERSION_MAJOR}::Widgets
+      ${ADD_TEST_FILE_LIBRARIES}
     )
     target_link_libraries(${TEST_NAME} PRIVATE test_utils)
     set(GUI_REQUIRED ${gui_required})
@@ -96,18 +105,44 @@ macro(add_test_file test_source gui_required)
     add_test(NAME ${TEST_NAME} COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME}${CMAKE_EXECUTABLE_SUFFIX})
     add_custom_command(TARGET strawberry_tests POST_BUILD COMMAND ./${TEST_NAME}${CMAKE_EXECUTABLE_SUFFIX})
     add_dependencies(build_tests ${TEST_NAME})
-endmacro(add_test_file)
+endmacro()
 
-add_test_file(src/utilities_test.cpp false)
-add_test_file(src/concurrentrun_test.cpp false)
-add_test_file(src/mutex_protected_test.cpp false)
-add_test_file(src/mergedproxymodel_test.cpp false)
-add_test_file(src/sqlite_test.cpp false)
-add_test_file(src/tagreader_test.cpp false)
-add_test_file(src/collectionbackend_test.cpp false)
-add_test_file(src/collectionmodel_test.cpp true)
-add_test_file(src/songplaylistitem_test.cpp false)
-add_test_file(src/organizeformat_test.cpp false)
-add_test_file(src/playlist_test.cpp true)
+add_test_file(FALSE
+  SOURCES src/utilities_test.cpp
+  LIBRARIES strawberry_core strawberry_utilities
+)
+
+add_test_file(FALSE SOURCES src/concurrentrun_test.cpp)
+
+add_test_file(FALSE SOURCES src/mergedproxymodel_test.cpp)
+
+add_test_file(FALSE SOURCES src/sqlite_test.cpp)
+
+add_test_file(FALSE SOURCES src/tagreader_test.cpp LIBRARIES strawberry_tagreader)
+
+add_test_file(FALSE
+  SOURCES src/collectionbackend_test.cpp
+  LIBRARIES strawberry_tagreader strawberry_collection
+)
+
+add_test_file(TRUE
+  SOURCES src/collectionmodel_test.cpp
+  LIBRARIES strawberry_tagreader strawberry_collection
+)
+
+add_test_file(FALSE
+  SOURCES src/songplaylistitem_test.cpp
+  LIBRARIES strawberry_playlist
+)
+
+add_test_file(FALSE
+  SOURCES src/organizeformat_test.cpp
+  LIBRARIES strawberry_organize
+)
+
+add_test_file(TRUE
+  SOURCES src/playlist_test.cpp
+  LIBRARIES strawberry_playlist
+)
 
 add_custom_target(run_strawberry_tests COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS strawberry_tests)

@@ -23,7 +23,7 @@
 #include <QContextMenuEvent>
 
 #include "core/logging.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "smartplaylistsmodel.h"
 #include "smartplaylistsview.h"
 #include "smartplaylistwizard.h"

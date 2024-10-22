@@ -29,7 +29,7 @@
 #include <QList>
 #include <QString>
 
-#include "ui_about.h"
+#include "dialogs/ui_about.h"
 
 class QWidget;
 

@@ -89,7 +89,7 @@
 #include "constants/mainwindowsettings.h"
 #include "includes/shared_ptr.h"
 #include "core/commandlineoptions.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "core/iconloader.h"
 #include "core/taskmanager.h"
 #include "core/song.h"
@@ -100,10 +100,10 @@
 #include "core/filesystemmusicstorage.h"
 #include "core/deletefiles.h"
 #include "core/settings.h"
-#include "core/player.h"
 #include "utilities/envutils.h"
 #include "utilities/filemanagerutils.h"
 #include "utilities/screenutils.h"
+#include "player/player.h"
 #include "engine/enginebase.h"
 #include "dialogs/errordialog.h"
 #include "dialogs/about.h"
@@ -112,8 +112,8 @@
 #include "dialogs/deleteconfirmationdialog.h"
 #include "dialogs/lastfmimportdialog.h"
 #include "dialogs/snapdialog.h"
-#include "dialogs/edittagdialog.h"
-#include "dialogs/trackselectiondialog.h"
+#include "edittagdialog/edittagdialog.h"
+#include "edittagdialog/trackselectiondialog.h"
 #include "organize/organizedialog.h"
 #include "widgets/fancytabwidget.h"
 #include "widgets/playingwidget.h"
@@ -213,7 +213,7 @@
 #endif
 
 #ifdef Q_OS_MACOS
-#  include "core/mac_startup.h"
+#  include "macstartup/mac_startup.h"
 #  include "systemtrayicon/macsystemtrayicon.h"
 #  include "utilities/macosutils.h"
 #else

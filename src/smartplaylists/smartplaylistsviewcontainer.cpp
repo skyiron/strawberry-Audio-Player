@@ -25,7 +25,7 @@
 #include <QShowEvent>
 
 #include "core/iconloader.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "core/settings.h"
 #include "constants/appearancesettings.h"
 

@@ -67,7 +67,7 @@
 #include "core/song.h"
 #include "core/iconloader.h"
 #include "core/settings.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "collection/collectionfilterwidget.h"
 #include "collection/collectionmodel.h"
 #include "collection/groupbydialog.h"

@@ -37,7 +37,7 @@
 #include "transcoderoptionsasf.h"
 #include "transcoderoptionsaac.h"
 #include "transcoderoptionsmp3.h"
-#include "ui_transcoderoptionsdialog.h"
+#include "transcoder/ui_transcoderoptionsdialog.h"
 
 TranscoderOptionsDialog::TranscoderOptionsDialog(Song::FileType type, QWidget *parent)
     : QDialog(parent),

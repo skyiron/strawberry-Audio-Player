@@ -27,7 +27,7 @@
 
 #include "transcoderoptionsinterface.h"
 #include "transcoderoptionsopus.h"
-#include "ui_transcoderoptionsopus.h"
+#include "transcoder/ui_transcoderoptionsopus.h"
 
 #include "core/settings.h"
 

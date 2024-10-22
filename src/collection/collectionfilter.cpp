@@ -28,7 +28,7 @@
 #include <QUrl>
 
 #include "core/song.h"
-#include "core/songmimedata.h"
+#include "mimedata/songmimedata.h"
 #include "filterparser/filterparser.h"
 #include "filterparser/filtertree.h"
 #include "collectionbackend.h"

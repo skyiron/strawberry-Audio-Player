@@ -40,7 +40,7 @@
 
 #include "includes/shared_ptr.h"
 #include "core/iconloader.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "collection/collectionbackend.h"
 #include "collection/collectionmodel.h"
 #include "collection/collectionfilterwidget.h"

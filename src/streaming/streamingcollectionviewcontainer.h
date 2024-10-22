@@ -35,7 +35,7 @@ class QProgressBar;
 class QContextMenuEvent;
 class CollectionFilterWidget;
 
-#include "ui_streamingcollectionviewcontainer.h"
+#include "streaming/ui_streamingcollectionviewcontainer.h"
 
 class StreamingCollectionViewContainer : public QWidget {
   Q_OBJECT

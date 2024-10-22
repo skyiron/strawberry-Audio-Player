@@ -25,7 +25,7 @@
 #include <QUrl>
 #include <QLineEdit>
 
-#include "ui_addstreamdialog.h"
+#include "dialogs/ui_addstreamdialog.h"
 
 class AddStreamDialog : public QDialog {
   Q_OBJECT

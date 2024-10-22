@@ -27,7 +27,7 @@
 
 #include "transcoderoptionsinterface.h"
 #include "transcoderoptionsasf.h"
-#include "ui_transcoderoptionsasf.h"
+#include "transcoder/ui_transcoderoptionsasf.h"
 
 #include "core/settings.h"
 

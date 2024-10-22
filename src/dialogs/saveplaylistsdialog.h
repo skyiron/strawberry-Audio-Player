@@ -25,7 +25,7 @@
 #include <QLineEdit>
 #include <QComboBox>
 
-#include "ui_saveplaylistsdialog.h"
+#include "dialogs/ui_saveplaylistsdialog.h"
 
 class SavePlaylistsDialog : public QDialog {
  Q_OBJECT

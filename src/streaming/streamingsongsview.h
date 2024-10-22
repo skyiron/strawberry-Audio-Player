@@ -35,7 +35,7 @@ class QContextMenuEvent;
 class StreamingService;
 class StreamingCollectionView;
 
-#include "ui_streamingcollectionviewcontainer.h"
+#include "streaming/ui_streamingcollectionviewcontainer.h"
 
 class StreamingSongsView : public QWidget {
   Q_OBJECT

@@ -45,7 +45,7 @@
 #include "core/iconloader.h"
 #include "core/logging.h"
 #include "core/settings.h"
-#include "core/player.h"
+#include "player/player.h"
 #include "engine/enginebase.h"
 #include "engine/enginedevice.h"
 #include "engine/devicefinders.h"

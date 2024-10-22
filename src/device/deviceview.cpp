@@ -53,7 +53,7 @@
 #include "core/iconloader.h"
 #include "core/deletefiles.h"
 #include "core/mergedproxymodel.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "core/musicstorage.h"
 #include "utilities/colorutils.h"
 #include "organize/organizedialog.h"

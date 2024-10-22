@@ -26,7 +26,7 @@
 
 #include <QObject>
 
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "playlistitem.h"
 
 class PlaylistItemMimeData : public MimeData {

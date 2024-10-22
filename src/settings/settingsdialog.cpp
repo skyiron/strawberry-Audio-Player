@@ -48,7 +48,7 @@
 #include <QCloseEvent>
 
 #include "core/settings.h"
-#include "core/player.h"
+#include "player/player.h"
 #include "utilities/screenutils.h"
 #include "widgets/groupediconview.h"
 #include "collection/collectionlibrary.h"

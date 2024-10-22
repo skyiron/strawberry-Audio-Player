@@ -31,7 +31,7 @@
 #include <QSize>
 
 #include "core/iconloader.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "streamsongmimedata.h"
 #include "streamingservice.h"
 #include "streamingsearchmodel.h"

@@ -62,7 +62,7 @@
 #include "includes/qt_blurimage.h"
 #include "core/song.h"
 #include "core/settings.h"
-#include "core/player.h"
+#include "player/player.h"
 #include "playlistmanager.h"
 #include "playlist.h"
 #include "playlistdelegates.h"

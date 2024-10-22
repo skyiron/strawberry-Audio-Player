@@ -28,7 +28,7 @@
 
 #include "transcoderoptionsinterface.h"
 #include "transcoderoptionsvorbis.h"
-#include "ui_transcoderoptionsvorbis.h"
+#include "transcoder/ui_transcoderoptionsvorbis.h"
 
 #include "core/settings.h"
 

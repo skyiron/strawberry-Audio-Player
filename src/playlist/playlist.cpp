@@ -60,10 +60,10 @@
 
 #include "includes/shared_ptr.h"
 #include "core/logging.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "core/song.h"
 #include "core/settings.h"
-#include "core/songmimedata.h"
+#include "mimedata/songmimedata.h"
 #include "constants/timeconstants.h"
 #include "constants/playlistsettings.h"
 #include "tagreader/tagreaderclient.h"

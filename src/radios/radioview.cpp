@@ -27,7 +27,7 @@
 #include <QShowEvent>
 #include <QContextMenuEvent>
 
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "core/iconloader.h"
 #include "radiomodel.h"
 #include "radioview.h"

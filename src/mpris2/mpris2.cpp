@@ -48,7 +48,7 @@
 
 #include "constants/timeconstants.h"
 #include "core/song.h"
-#include "core/player.h"
+#include "player/player.h"
 #include "engine/enginebase.h"
 #include "playlist/playlist.h"
 #include "playlist/playlistitem.h"

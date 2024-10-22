@@ -32,7 +32,7 @@
 #include <QKeyEvent>
 
 #include "globalshortcutgrabber.h"
-#include "ui_globalshortcutgrabber.h"
+#include "globalshortcuts/ui_globalshortcutgrabber.h"
 
 using namespace Qt::Literals::StringLiterals;
 

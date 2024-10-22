@@ -41,7 +41,7 @@
 #include "core/filesystemmusicstorage.h"
 #include "core/iconloader.h"
 #include "core/settings.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "dialogs/deleteconfirmationdialog.h"
 #include "fileview.h"
 #include "fileviewlist.h"

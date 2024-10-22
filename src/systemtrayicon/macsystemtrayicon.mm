@@ -33,7 +33,7 @@
 
 #include "macsystemtrayicon.h"
 
-#include "includes/mac_delegate.h"
+#include "macstartup/mac_delegate.h"
 
 #include "core/song.h"
 #include "core/iconloader.h"

@@ -51,7 +51,7 @@
 #include <QContextMenuEvent>
 
 #include "core/iconloader.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "core/musicstorage.h"
 #include "core/deletefiles.h"
 #include "core/settings.h"
@@ -69,7 +69,7 @@
 #  include "device/devicemanager.h"
 #  include "device/devicestatefiltermodel.h"
 #endif
-#include "dialogs/edittagdialog.h"
+#include "edittagdialog/edittagdialog.h"
 #include "dialogs/deleteconfirmationdialog.h"
 #include "organize/organizedialog.h"
 #include "organize/organizeerrordialog.h"

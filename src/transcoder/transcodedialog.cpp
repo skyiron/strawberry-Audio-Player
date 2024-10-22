@@ -64,8 +64,8 @@
 #include "transcodedialog.h"
 #include "transcoder.h"
 #include "transcoderoptionsdialog.h"
-#include "ui_transcodedialog.h"
-#include "ui_transcodelogdialog.h"
+#include "transcoder/ui_transcodedialog.h"
+#include "transcoder/ui_transcodelogdialog.h"
 
 using namespace Qt::Literals::StringLiterals;
 

@@ -22,7 +22,7 @@
 
 #include <QWidget>
 
-#include "ui_radioviewcontainer.h"
+#include "radios/ui_radioviewcontainer.h"
 
 class RadioView;
 

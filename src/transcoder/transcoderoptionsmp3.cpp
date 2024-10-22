@@ -31,7 +31,7 @@
 
 #include "transcoderoptionsinterface.h"
 #include "transcoderoptionsmp3.h"
-#include "ui_transcoderoptionsmp3.h"
+#include "transcoder/ui_transcoderoptionsmp3.h"
 
 #include "core/settings.h"
 

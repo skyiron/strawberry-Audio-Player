@@ -23,7 +23,7 @@
 
 #include "config.h"
 
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "playlistgenerator_fwd.h"
 
 class PlaylistGeneratorMimeData : public MimeData {

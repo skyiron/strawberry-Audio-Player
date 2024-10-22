@@ -59,7 +59,7 @@
 #include "constants/notificationssettings.h"
 
 #include "osdpretty.h"
-#include "ui_osdpretty.h"
+#include "osd/ui_osdpretty.h"
 
 #ifdef Q_OS_WIN
 #  include <windows.h>

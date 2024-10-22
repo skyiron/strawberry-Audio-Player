@@ -22,7 +22,7 @@
 
 #include <QObject>
 
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "core/song.h"
 
 class RadioMimeData : public MimeData {

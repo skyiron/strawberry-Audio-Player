@@ -26,7 +26,7 @@
 #include "collectionfilterwidget.h"
 #include "collectionview.h"
 #include "collectionviewcontainer.h"
-#include "ui_collectionviewcontainer.h"
+#include "collection/ui_collectionviewcontainer.h"
 
 CollectionViewContainer::CollectionViewContainer(QWidget *parent) : QWidget(parent), ui_(new Ui_CollectionViewContainer) {
 

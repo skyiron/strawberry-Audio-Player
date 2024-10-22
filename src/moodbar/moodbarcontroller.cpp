@@ -26,7 +26,7 @@
 #include "includes/shared_ptr.h"
 #include "core/song.h"
 #include "core/settings.h"
-#include "core/player.h"
+#include "player/player.h"
 #include "engine/enginebase.h"
 #include "constants/moodbarsettings.h"
 

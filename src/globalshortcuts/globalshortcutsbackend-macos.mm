@@ -38,7 +38,7 @@
 
 #include "globalshortcutsmanager.h"
 #include "core/logging.h"
-#include "core/mac_startup.h"
+#include "macstartup/mac_startup.h"
 
 #import "includes/SBSystemPreferences.h"
 

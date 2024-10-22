@@ -46,7 +46,7 @@
 #include "includes/shared_ptr.h"
 #include "core/logging.h"
 #include "core/iconloader.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "core/settings.h"
 #include "widgets/favoritewidget.h"
 #include "widgets/renametablineedit.h"

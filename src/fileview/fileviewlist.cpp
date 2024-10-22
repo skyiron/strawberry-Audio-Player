@@ -32,7 +32,7 @@
 #include <QtEvents>
 
 #include "core/iconloader.h"
-#include "core/mimedata.h"
+#include "mimedata/mimedata.h"
 #include "utilities/filemanagerutils.h"
 #include "fileviewlist.h"
 

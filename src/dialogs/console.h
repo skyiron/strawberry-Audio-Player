@@ -29,7 +29,7 @@
 #include <QDialog>
 #include <QString>
 
-#include "ui_console.h"
+#include "dialogs/ui_console.h"
 
 #include "includes/shared_ptr.h"
 

@@ -27,7 +27,7 @@
 
 #include "transcoderoptionsinterface.h"
 #include "transcoderoptionsflac.h"
-#include "ui_transcoderoptionsflac.h"
+#include "transcoder/ui_transcoderoptionsflac.h"
 
 #include "core/settings.h"
 

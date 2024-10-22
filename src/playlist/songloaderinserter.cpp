@@ -32,7 +32,7 @@
 #include "core/logging.h"
 #include "core/urlhandlers.h"
 #include "core/taskmanager.h"
-#include "core/songloader.h"
+#include "songloader/songloader.h"
 #include "playlist.h"
 #include "songloaderinserter.h"
 

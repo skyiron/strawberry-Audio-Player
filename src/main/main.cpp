@@ -82,7 +82,7 @@
 
 #ifdef Q_OS_MACOS
 #  include "utilities/macosutils.h"
-#  include "core/mac_startup.h"
+#  include "macstartup/mac_startup.h"
 #endif
 
 #ifdef HAVE_MPRIS2
@@ -93,9 +93,9 @@
 #include "core/commandlineoptions.h"
 #include "core/networkproxyfactory.h"
 
-#include "core/application.h"
-#include "core/metatypes.h"
-#include "core/mainwindow.h"
+#include "main/application.h"
+#include "main/metatypes.h"
+#include "main/mainwindow.h"
 
 #ifdef Q_OS_MACOS
 #  include "systemtrayicon/macsystemtrayicon.h"
@@ -104,7 +104,7 @@
 #endif
 
 #ifdef HAVE_TRANSLATIONS
-#  include "core/translations.h"
+#  include "main/translations.h"
 #endif
 
 #include "constants/behavioursettings.h"
