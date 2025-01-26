@@ -38,7 +38,7 @@ StreamPlaylistItem::StreamPlaylistItem(const Song &song)
 
 bool StreamPlaylistItem::InitFromQuery(const SqlRow &query) {
 
-  song_.InitFromQuery(query, false, static_cast<int>(Song::kRowIdColumns.count()));
+  song_.InitFromQuery(query, false, static_cast<int>(Song::kRowIdColumns.count() * 2));
   InitMetadata();
   return true;
 
