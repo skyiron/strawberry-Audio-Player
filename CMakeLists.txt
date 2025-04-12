@@ -212,8 +212,6 @@ find_package(GTest)
 
 pkg_check_modules(LIBSPARSEHASH IMPORTED_TARGET libsparsehash)
 
-find_package(RapidJSON)
-
 set(QT_VERSION_MAJOR 6)
 set(QT_MIN_VERSION 6.4.0)
 set(QT_DEFAULT_MAJOR_VERSION ${QT_VERSION_MAJOR})
@@ -366,9 +364,7 @@ optional_component(STREAMTAGREADER ON "Stream tagreader"
   DEPENDS "sparsehash" LIBSPARSEHASH_FOUND
 )
 
-optional_component(DISCORD_RPC ON "Discord Rich Presence"
-  DEPENDS "RapidJSON" RapidJSON_FOUND
-)
+optional_component(DISCORD_RPC ON "Discord Rich Presence")
 
 if(HAVE_SONGFINGERPRINTING OR HAVE_MUSICBRAINZ)
   set(HAVE_CHROMAPRINT ON)

@@ -25,6 +25,7 @@
 #define DISCORD_RPC_H
 
 #include <cstdint>
+#include <QString>
 
 namespace discord_rpc {
 
@@ -32,40 +33,41 @@ namespace discord_rpc {
 extern "C" {
 #endif
 
-typedef struct DiscordRichPresence {
+class DiscordRichPresence {
+ public:
   int type;
-  const char *name;    /* max 128 bytes */
-  const char *state;   /* max 128 bytes */
-  const char *details; /* max 128 bytes */
-  int64_t startTimestamp;
-  int64_t endTimestamp;
-  const char *largeImageKey;  /* max 32 bytes */
-  const char *largeImageText; /* max 128 bytes */
-  const char *smallImageKey;  /* max 32 bytes */
-  const char *smallImageText; /* max 128 bytes */
-  const char *partyId;        /* max 128 bytes */
+  QString name;    /* max 128 bytes */
+  QString state;   /* max 128 bytes */
+  QString details; /* max 128 bytes */
+  qint64 startTimestamp;
+  qint64 endTimestamp;
+  QString largeImageKey;  /* max 32 bytes */
+  QString largeImageText; /* max 128 bytes */
+  QString smallImageKey;  /* max 32 bytes */
+  QString smallImageText; /* max 128 bytes */
+  QString partyId;        /* max 128 bytes */
   int partySize;
   int partyMax;
   int partyPrivacy;
-  const char *matchSecret;    /* max 128 bytes */
-  const char *joinSecret;     /* max 128 bytes */
-  const char *spectateSecret; /* max 128 bytes */
-  int8_t instance;
-} DiscordRichPresence;
+  QString matchSecret;    /* max 128 bytes */
+  QString joinSecret;     /* max 128 bytes */
+  QString spectateSecret; /* max 128 bytes */
+  qint8 instance;
+};
 
 typedef struct DiscordUser {
-  const char *userId;
-  const char *username;
-  const char *discriminator;
-  const char *avatar;
+  const QString userId;
+  const QString username;
+  const QString discriminator;
+  const QString avatar;
 } DiscordUser;
 
 typedef struct DiscordEventHandlers {
   void (*ready)(const DiscordUser *request);
-  void (*disconnected)(int errorCode, const char *message);
-  void (*errored)(int errorCode, const char *message);
-  void (*joinGame)(const char *joinSecret);
-  void (*spectateGame)(const char *spectateSecret);
+  void (*disconnected)(int errorCode, const QString &message);
+  void (*errored)(int errorCode, const QString &message);
+  void (*joinGame)(const QString &joinSecret);
+  void (*spectateGame)(const QString &spectateSecret);
   void (*joinRequest)(const DiscordUser *request);
 } DiscordEventHandlers;
 
@@ -75,14 +77,14 @@ typedef struct DiscordEventHandlers {
 #define DISCORD_PARTY_PRIVATE 0
 #define DISCORD_PARTY_PUBLIC  1
 
-void Discord_Initialize(const char *applicationId, DiscordEventHandlers *handlers, const int autoRegister);
-void Discord_Shutdown(void);
+void Discord_Initialize(const QString &applicationId, DiscordEventHandlers *handlers, const int autoRegister);
+void Discord_Shutdown();
 
 // checks for incoming messages, dispatches callbacks
-void Discord_RunCallbacks(void);
+void Discord_RunCallbacks();
 
-void Discord_UpdatePresence(const DiscordRichPresence *presence);
-void Discord_ClearPresence(void);
+void Discord_UpdatePresence(const DiscordRichPresence &presence = DiscordRichPresence());
+void Discord_ClearPresence();
 
 void Discord_Respond(const char *userid, /* DISCORD_REPLY_ */ int reply);
 

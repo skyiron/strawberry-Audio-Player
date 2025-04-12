@@ -21,18 +21,24 @@
  *
  */
 
+#include <QString>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 #include "discord_rpc_connection.h"
 #include "discord_serialization.h"
+
+using namespace Qt::Literals::StringLiterals;
 
 namespace discord_rpc {
 
 static const int RpcVersion = 1;
 static RpcConnection Instance;
 
-RpcConnection *RpcConnection::Create(const char *applicationId) {
+RpcConnection *RpcConnection::Create(const QString &applicationId) {
 
   Instance.connection = BaseConnection::Create();
-  StringCopy(Instance.appId, applicationId);
+  Instance.appId = applicationId;
   return &Instance;
 
 }
@@ -56,14 +62,15 @@ void RpcConnection::Open() {
   }
 
   if (state == State::SentHandshake) {
-    JsonDocument message;
-    if (Read(message)) {
-      auto cmd = GetStrMember(&message, "cmd");
-      auto evt = GetStrMember(&message, "evt");
-      if (cmd && evt && !strcmp(cmd, "DISPATCH") && !strcmp(evt, "READY")) {
+    QJsonDocument json_document;
+    if (Read(json_document)) {
+      const QJsonObject json_object = json_document.object();
+      const QString cmd = json_object["cmd"_L1].toString();
+      const QString evt = json_object["evt"_L1].toString();
+      if (cmd == "DISPATCH"_L1 && evt == "READY"_L1) {
         state = State::Connected;
         if (onConnect) {
-          onConnect(message);
+          onConnect(json_document);
         }
       }
     }
@@ -106,7 +113,7 @@ bool RpcConnection::Write(const void *data, size_t length) {
 
 }
 
-bool RpcConnection::Read(JsonDocument &message) {
+bool RpcConnection::Read(QJsonDocument &message) {
 
   if (state != State::Connected && state != State::SentHandshake) {
     return false;
@@ -117,7 +124,7 @@ bool RpcConnection::Read(JsonDocument &message) {
     if (!didRead) {
       if (!connection->isOpen) {
         lastErrorCode = static_cast<int>(ErrorCode::PipeClosed);
-        StringCopy(lastErrorMessage, "Pipe closed");
+        lastErrorMessage = "Pipe closed"_L1;
         Close();
       }
       return false;
@@ -127,7 +134,7 @@ bool RpcConnection::Read(JsonDocument &message) {
       didRead = connection->Read(readFrame.message, readFrame.length);
       if (!didRead) {
         lastErrorCode = static_cast<int>(ErrorCode::ReadCorrupt);
-        StringCopy(lastErrorMessage, "Partial data in frame");
+        lastErrorMessage = "Partial data in frame"_L1;
         Close();
         return false;
       }
@@ -136,14 +143,14 @@ bool RpcConnection::Read(JsonDocument &message) {
 
     switch (readFrame.opcode) {
       case Opcode::Close: {
-        message.ParseInsitu(readFrame.message);
-        lastErrorCode = GetIntMember(&message, "code");
-        StringCopy(lastErrorMessage, GetStrMember(&message, "message", ""));
+        message = QJsonDocument::fromJson(readFrame.message);
+        lastErrorCode = message["code"_L1].toInt();
+        lastErrorMessage = message["message"_L1].toString();
         Close();
         return false;
       }
       case Opcode::Frame:
-        message.ParseInsitu(readFrame.message);
+        message = QJsonDocument::fromJson(readFrame.message);
         return true;
       case Opcode::Ping:
         readFrame.opcode = Opcode::Pong;
@@ -157,7 +164,7 @@ bool RpcConnection::Read(JsonDocument &message) {
       default:
         // something bad happened
         lastErrorCode = static_cast<int>(ErrorCode::ReadCorrupt);
-        StringCopy(lastErrorMessage, "Bad ipc frame");
+        lastErrorMessage = "Bad ipc frame"_L1;
         Close();
         return false;
     }

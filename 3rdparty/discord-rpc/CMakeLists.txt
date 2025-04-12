@@ -37,5 +37,6 @@ if(WIN32)
   target_link_libraries(discord-rpc PRIVATE psapi advapi32)
 endif()
 
-target_include_directories(discord-rpc SYSTEM PRIVATE ${RapidJSON_INCLUDE_DIRS})
+target_link_libraries(discord-rpc PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+
 target_include_directories(discord-rpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

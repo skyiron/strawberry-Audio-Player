@@ -21,9 +21,14 @@
  *
  */
 
+#include <QString>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 #include "discord_serialization.h"
-#include "discord_connection.h"
 #include "discord_rpc.h"
+
+using namespace Qt::Literals::StringLiterals;
 
 namespace discord_rpc {
 
@@ -53,229 +58,129 @@ void NumberToString(char *dest, T number) {
 
 }
 
-// it's ever so slightly faster to not have to strlen the key
-template<typename T>
-void WriteKey(JsonWriter &w, T &k) {
-  w.Key(k, sizeof(T) - 1);
-}
+void WriteOptionalString(QJsonObject &json_object, const QString &key, const QString &value);
+void WriteOptionalString(QJsonObject &json_object, const QString &key, const QString &value) {
 
-struct WriteObject {
-  JsonWriter &writer;
-  WriteObject(JsonWriter &w)
-      : writer(w) {
-    writer.StartObject();
-  }
-  template<typename T>
-  WriteObject(JsonWriter &w, T &name)
-      : writer(w) {
-    WriteKey(writer, name);
-    writer.StartObject();
-  }
-  ~WriteObject() { writer.EndObject(); }
-};
-
-struct WriteArray {
-  JsonWriter &writer;
-  template<typename T>
-  WriteArray(JsonWriter &w, T &name)
-      : writer(w) {
-    WriteKey(writer, name);
-    writer.StartArray();
-  }
-  ~WriteArray() { writer.EndArray(); }
-};
-
-template<typename T>
-void WriteOptionalString(JsonWriter &w, T &k, const char *value) {
-
-  if (value && value[0]) {
-    w.Key(k, sizeof(T) - 1);
-    w.String(value);
+  if (!value.isEmpty()) {
+    json_object[key] = value;
   }
 
 }
 
-static void JsonWriteNonce(JsonWriter &writer, const int nonce) {
+static QString JsonWriteNonce(const int nonce) {
 
-  WriteKey(writer, "nonce");
-  char nonceBuffer[32];
-  NumberToString(nonceBuffer, nonce);
-  writer.String(nonceBuffer);
+  char nonce_buffer[32]{};
+  NumberToString(nonce_buffer, nonce);
+
+  return QString::fromLatin1(nonce_buffer);
 
 }
 
-size_t JsonWriteRichPresenceObj(char *dest, const size_t maxLen, const int nonce, const int pid, const DiscordRichPresence *presence) {
+size_t JsonWriteRichPresenceObj(char *dest, const size_t maxLen, const int nonce, const int pid, const DiscordRichPresence &presence) {
 
-  JsonWriter writer(dest, maxLen);
+  QJsonObject json_object;
 
-  {
-    WriteObject top(writer);
+  json_object["nonce"_L1] = JsonWriteNonce(nonce);
+  json_object["cmd"_L1] = "SET_ACTIVITY"_L1;
 
-    JsonWriteNonce(writer, nonce);
+  QJsonObject args;
+  args["pid"_L1] = pid;
 
-    WriteKey(writer, "cmd");
-    writer.String("SET_ACTIVITY");
+  QJsonObject activity;
 
-    {
-      WriteObject args(writer, "args");
+  if (presence.type >= 0 && presence.type <= 5) {
+    activity["type"_L1] = presence.type;
+  }
 
-      WriteKey(writer, "pid");
-      writer.Int(pid);
+  activity["state"_L1] = presence.state;
+  activity["details"_L1] = presence.details;
 
-      if (presence != nullptr) {
-        WriteObject activity(writer, "activity");
-
-        if (presence->type >= 0 && presence->type <= 5) {
-          WriteKey(writer, "type");
-          writer.Int(presence->type);
-        }
-
-        WriteOptionalString(writer, "name", presence->name);
-        WriteOptionalString(writer, "state", presence->state);
-        WriteOptionalString(writer, "details", presence->details);
-
-        if (presence->startTimestamp || presence->endTimestamp) {
-          WriteObject timestamps(writer, "timestamps");
-
-          if (presence->startTimestamp) {
-            WriteKey(writer, "start");
-            writer.Int64(presence->startTimestamp);
-          }
-
-          if (presence->endTimestamp) {
-            WriteKey(writer, "end");
-            writer.Int64(presence->endTimestamp);
-          }
-        }
-
-        if ((presence->largeImageKey && presence->largeImageKey[0]) ||
-            (presence->largeImageText && presence->largeImageText[0]) ||
-            (presence->smallImageKey && presence->smallImageKey[0]) ||
-            (presence->smallImageText && presence->smallImageText[0])) {
-          WriteObject assets(writer, "assets");
-          WriteOptionalString(writer, "large_image", presence->largeImageKey);
-          WriteOptionalString(writer, "large_text", presence->largeImageText);
-          WriteOptionalString(writer, "small_image", presence->smallImageKey);
-          WriteOptionalString(writer, "small_text", presence->smallImageText);
-        }
-
-        if ((presence->partyId && presence->partyId[0]) || presence->partySize ||
-            presence->partyMax || presence->partyPrivacy) {
-          WriteObject party(writer, "party");
-          WriteOptionalString(writer, "id", presence->partyId);
-          if (presence->partySize && presence->partyMax) {
-            WriteArray size(writer, "size");
-            writer.Int(presence->partySize);
-            writer.Int(presence->partyMax);
-          }
-
-          if (presence->partyPrivacy) {
-            WriteKey(writer, "privacy");
-            writer.Int(presence->partyPrivacy);
-          }
-        }
-
-        if ((presence->matchSecret && presence->matchSecret[0]) ||
-            (presence->joinSecret && presence->joinSecret[0]) ||
-            (presence->spectateSecret && presence->spectateSecret[0])) {
-          WriteObject secrets(writer, "secrets");
-          WriteOptionalString(writer, "match", presence->matchSecret);
-          WriteOptionalString(writer, "join", presence->joinSecret);
-          WriteOptionalString(writer, "spectate", presence->spectateSecret);
-        }
-
-        writer.Key("instance");
-        writer.Bool(presence->instance != 0);
-      }
+  if (presence.startTimestamp != 0 || presence.endTimestamp != 0) {
+    QJsonObject timestamps;
+    if (presence.startTimestamp != 0) {
+      timestamps["start"_L1] = presence.startTimestamp;
     }
+    if (presence.endTimestamp != 0) {
+      timestamps["end"_L1] = presence.endTimestamp;
+    }
+    activity["timestamps"_L1] = timestamps;
   }
 
-  return writer.Size();
-}
-
-size_t JsonWriteHandshakeObj(char *dest, size_t maxLen, int version, const char *applicationId) {
-
-  JsonWriter writer(dest, maxLen);
-
-  {
-    WriteObject obj(writer);
-    WriteKey(writer, "v");
-    writer.Int(version);
-    WriteKey(writer, "client_id");
-    writer.String(applicationId);
+  if (!presence.largeImageKey.isEmpty() || !presence.largeImageText.isEmpty() || !presence.smallImageKey.isEmpty() || !presence.smallImageText.isEmpty()) {
+    QJsonObject assets;
+    WriteOptionalString(assets, "large_image"_L1, presence.largeImageKey);
+    WriteOptionalString(assets, "large_text"_L1, presence.largeImageText);
+    WriteOptionalString(assets, "small_image"_L1, presence.smallImageKey);
+    WriteOptionalString(assets, "small_text"_L1, presence.smallImageText);
+    activity["assets"_L1] = assets;
   }
 
-  return writer.Size();
+  activity["instance"_L1] = presence.instance != 0;
+  args["activity"_L1] = activity;
+  json_object["args"_L1] = args;
 
-}
+  QJsonDocument json_document(json_object);
+  QByteArray data = json_document.toJson(QJsonDocument::Compact);
+  strncpy(dest, data.constData(), maxLen);
 
-size_t JsonWriteSubscribeCommand(char *dest, size_t maxLen, int nonce, const char *evtName) {
-
-  JsonWriter writer(dest, maxLen);
-
-  {
-    WriteObject obj(writer);
-
-    JsonWriteNonce(writer, nonce);
-
-    WriteKey(writer, "cmd");
-    writer.String("SUBSCRIBE");
-
-    WriteKey(writer, "evt");
-    writer.String(evtName);
-  }
-
-  return writer.Size();
+  return data.length();
 
 }
 
-size_t JsonWriteUnsubscribeCommand(char *dest, size_t maxLen, int nonce, const char *evtName) {
+size_t JsonWriteHandshakeObj(char *dest, const size_t maxLen, const int version, const QString &applicationId) {
 
-  JsonWriter writer(dest, maxLen);
+  QJsonObject json_object;
+  json_object["v"_L1] = version;
+  json_object["client_id"_L1] = applicationId;
+  const QJsonDocument json_document(json_object);
+  const QByteArray data = json_document.toJson(QJsonDocument::Compact);
+  strncpy(dest, data.constData(), maxLen);
 
-  {
-    WriteObject obj(writer);
+  return data.length();
 
-    JsonWriteNonce(writer, nonce);
+}
 
-    WriteKey(writer, "cmd");
-    writer.String("UNSUBSCRIBE");
+size_t JsonWriteSubscribeCommand(char *dest, const size_t maxLen, const int nonce, const char *evtName) {
 
-    WriteKey(writer, "evt");
-    writer.String(evtName);
-  }
+  QJsonObject json_object;
+  json_object["nonce"_L1] = JsonWriteNonce(nonce);
+  json_object["cmd"_L1] = "SUBSCRIBE"_L1;
+  json_object["evt"_L1] = QLatin1String(evtName);
+  const QJsonDocument json_document(json_object);
+  const QByteArray data = json_document.toJson(QJsonDocument::Compact);
+  strncpy(dest, data.constData(), maxLen);
 
-  return writer.Size();
+  return data.length();
+
+}
+
+size_t JsonWriteUnsubscribeCommand(char *dest, const size_t maxLen, const int nonce, const char *evtName) {
+
+  QJsonObject json_object;
+  json_object["nonce"_L1] = JsonWriteNonce(nonce);
+  json_object["cmd"_L1] = "UNSUBSCRIBE"_L1;
+  json_object["evt"_L1] = QLatin1String(evtName);
+  const QJsonDocument json_document(json_object);
+  const QByteArray data = json_document.toJson(QJsonDocument::Compact);
+  strncpy(dest, data.constData(), maxLen);
+
+  return data.length();
 
 }
 
 size_t JsonWriteJoinReply(char *dest, size_t maxLen, const char *userId, const int reply, const int nonce) {
 
-  JsonWriter writer(dest, maxLen);
+  QJsonObject json_object;
+  json_object["nonce"_L1] = JsonWriteNonce(nonce);
+  json_object["cmd"_L1] = reply == DISCORD_REPLY_YES ? "SEND_ACTIVITY_JOIN_INVITE"_L1 : "CLOSE_ACTIVITY_JOIN_REQUEST"_L1;
+  QJsonObject args;
+  args["user_id"_L1] = QLatin1String(userId);
+  json_object["args"_L1] = args;
+  const QJsonDocument json_document(json_object);
+  const QByteArray data = json_document.toJson(QJsonDocument::Compact);
+  strncpy(dest, data.constData(), maxLen);
 
-  {
-    WriteObject obj(writer);
-
-    WriteKey(writer, "cmd");
-    if (reply == DISCORD_REPLY_YES) {
-      writer.String("SEND_ACTIVITY_JOIN_INVITE");
-    }
-    else {
-      writer.String("CLOSE_ACTIVITY_JOIN_REQUEST");
-    }
-
-    WriteKey(writer, "args");
-    {
-      WriteObject args(writer);
-
-      WriteKey(writer, "user_id");
-      writer.String(userId);
-    }
-
-    JsonWriteNonce(writer, nonce);
-  }
-
-  return writer.Size();
+  return data.length();
 
 }
 

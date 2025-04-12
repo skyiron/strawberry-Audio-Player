@@ -50,7 +50,7 @@ RichPresence::RichPresence(const SharedPtr<Player> player,
       playlist_manager_(playlist_manager),
       enabled_(false) {
 
-  Discord_Initialize(kDiscordApplicationId, nullptr, 1);
+  Discord_Initialize(QLatin1String(kDiscordApplicationId), nullptr, 1);
 
   QObject::connect(&*player_->engine(), &EngineBase::StateChanged, this, &RichPresence::EngineStateChanged);
   QObject::connect(&*playlist_manager_, &PlaylistManager::CurrentSongChanged, this, &RichPresence::CurrentSongChanged);
@@ -109,36 +109,33 @@ void RichPresence::SendPresenceUpdate() {
     return;
   }
 
-  ::DiscordRichPresence presence_data{};
-  memset(&presence_data, 0, sizeof(presence_data));
+  DiscordRichPresence presence_data{};
   presence_data.type = 2; // Listening
-  presence_data.largeImageKey = kStrawberryIconResourceName;
-  presence_data.smallImageKey = kStrawberryIconResourceName;
-  presence_data.smallImageText = kStrawberryIconDescription;
+  presence_data.largeImageKey = QLatin1String(kStrawberryIconResourceName);
+  presence_data.smallImageKey = QLatin1String(kStrawberryIconResourceName);
+  presence_data.smallImageText = QLatin1String(kStrawberryIconDescription);
   presence_data.instance = 0;
 
-  QByteArray artist;
   if (!activity_.artist.isEmpty()) {
-    artist = activity_.artist.toUtf8();
-    artist.prepend(tr("by ").toUtf8());
-    presence_data.state = artist.constData();
+    QString artist = activity_.artist;
+    artist.prepend(tr("by "));
+    presence_data.state = artist;
   }
 
-  QByteArray album;
   if (!activity_.album.isEmpty() && activity_.album != activity_.title) {
-    album = activity_.album.toUtf8();
-    album.prepend(tr("on ").toUtf8());
-    presence_data.largeImageText = album.constData();
+    QString album = activity_.album;
+    album.prepend(tr("on "));
+    presence_data.largeImageText = album;
   }
 
-  const QByteArray title = activity_.title.toUtf8();
-  presence_data.details = title.constData();
+  const QString title = activity_.title;
+  presence_data.details = title;
 
   const qint64 start_timestamp = activity_.start_timestamp - activity_.seek_secs;
   presence_data.startTimestamp = start_timestamp;
   presence_data.endTimestamp = start_timestamp + activity_.length_secs;
 
-  Discord_UpdatePresence(&presence_data);
+  Discord_UpdatePresence(presence_data);
 
 }
 

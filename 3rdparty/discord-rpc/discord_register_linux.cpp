@@ -21,9 +21,6 @@
  *
  */
 
-#include "discord_rpc.h"
-#include "discord_register.h"
-
 #include <cstdio>
 #include <errno.h>
 #include <cstdlib>
@@ -31,6 +28,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <QString>
+
+#include "discord_rpc.h"
+#include "discord_register.h"
 
 namespace {
 
@@ -48,7 +50,7 @@ static bool Mkdir(const char *path) {
 }  // namespace
 
 // We want to register games so we can run them from Discord client as discord-<appid>://
-extern "C" void Discord_Register(const char *applicationId, const char *command) {
+extern "C" void Discord_Register(const QString &applicationId, const char *command) {
 
   // Add a desktop file and update some mime handlers so that xdg-open does the right thing.
 
@@ -75,13 +77,13 @@ extern "C" void Discord_Register(const char *applicationId, const char *command)
                                        "Categories=Discord;Games;\n"
                                        "MimeType=x-scheme-handler/discord-%s;\n";
   char desktopFile[2048]{};
-  int fileLen = snprintf(desktopFile, sizeof(desktopFile), desktopFileFormat, applicationId, command, applicationId);
+  int fileLen = snprintf(desktopFile, sizeof(desktopFile), desktopFileFormat, applicationId.toUtf8().constData(), command, applicationId.toUtf8().constData());
   if (fileLen <= 0) {
     return;
   }
 
   char desktopFilename[256]{};
-  (void)snprintf(desktopFilename, sizeof(desktopFilename), "/discord-%s.desktop", applicationId);
+  (void)snprintf(desktopFilename, sizeof(desktopFilename), "/discord-%s.desktop", applicationId.toUtf8().constData());
 
   char desktopFilePath[1024]{};
   (void)snprintf(desktopFilePath, sizeof(desktopFilePath), "%s/.local", home);
@@ -111,8 +113,8 @@ extern "C" void Discord_Register(const char *applicationId, const char *command)
   snprintf(xdgMimeCommand,
            sizeof(xdgMimeCommand),
            "xdg-mime default discord-%s.desktop x-scheme-handler/discord-%s",
-           applicationId,
-           applicationId);
+           applicationId.toUtf8().constData(),
+           applicationId.toUtf8().constData());
   if (system(xdgMimeCommand) < 0) {
     fprintf(stderr, "Failed to register mime handler\n");
   }

@@ -24,11 +24,13 @@
 #ifndef DISCORD_REGISTER_H
 #define DISCORD_REGISTER_H
 
+#include <QString>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void Discord_Register(const char *applicationId, const char *command);
+void Discord_Register(const QString &applicationId, const char *command);
 
 #ifdef __cplusplus
 }

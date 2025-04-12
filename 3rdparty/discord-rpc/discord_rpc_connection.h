@@ -24,6 +24,9 @@
 #ifndef DISCORD_RPC_CONNECTION_H
 #define DISCORD_RPC_CONNECTION_H
 
+#include <QString>
+#include <QJsonDocument>
+
 #include "discord_connection.h"
 #include "discord_serialization.h"
 
@@ -65,14 +68,14 @@ struct RpcConnection {
 
   BaseConnection *connection { nullptr };
   State state { State::Disconnected };
-  void (*onConnect)(JsonDocument &message) { nullptr };
-  void (*onDisconnect)(int errorCode, const char *message) { nullptr };
-  char appId[64] {};
+  void (*onConnect)(QJsonDocument &message) { nullptr };
+  void (*onDisconnect)(int errorCode, QString &message) { nullptr };
+  QString appId;
   int lastErrorCode { 0 };
-  char lastErrorMessage[256] {};
+  QString lastErrorMessage;
   RpcConnection::MessageFrame sendFrame;
 
-  static RpcConnection *Create(const char *applicationId);
+  static RpcConnection *Create(const QString &applicationId);
   static void Destroy(RpcConnection *&);
 
   inline bool IsOpen() const { return state == State::Connected; }
@@ -80,7 +83,7 @@ struct RpcConnection {
   void Open();
   void Close();
   bool Write(const void *data, size_t length);
-  bool Read(JsonDocument &message);
+  bool Read(QJsonDocument &message);
 };
 
 }  // namespace discord_rpc

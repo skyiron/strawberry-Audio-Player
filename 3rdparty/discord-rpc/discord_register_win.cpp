@@ -147,10 +147,10 @@ static void Discord_RegisterW(const wchar_t *applicationId, const wchar_t *comma
 
 }
 
-extern "C" void Discord_Register(const char *applicationId, const char *command) {
+extern "C" void Discord_Register(const QString &applicationId, const char *command) {
 
   wchar_t appId[32]{};
-  MultiByteToWideChar(CP_UTF8, 0, applicationId, -1, appId, 32);
+  MultiByteToWideChar(CP_UTF8, 0, applicationId.toUtf8().constData(), -1, appId, 32);
 
   wchar_t openCommand[1024]{};
   const wchar_t *wcommand = nullptr;

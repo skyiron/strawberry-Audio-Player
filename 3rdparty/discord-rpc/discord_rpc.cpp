@@ -27,12 +27,18 @@
 #include <condition_variable>
 #include <thread>
 
+#include <QString>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 #include "discord_rpc.h"
 #include "discord_backoff.h"
 #include "discord_register.h"
 #include "discord_msg_queue.h"
 #include "discord_rpc_connection.h"
 #include "discord_serialization.h"
+
+using namespace Qt::Literals::StringLiterals;
 
 namespace discord_rpc {
 
@@ -52,17 +58,19 @@ struct QueuedMessage {
   }
 };
 
-struct User {
+class User {
+ public:
+  explicit User() {}
   // snowflake (64bit int), turned into a ascii decimal string, at most 20 chars +1 null
   // terminator = 21
-  char userId[32];
+  QString userId;
   // 32 unicode glyphs is max name size => 4 bytes per glyph in the worst case, +1 for null
   // terminator = 129
-  char username[344];
+  QString username;
   // 4 decimal digits + 1 null terminator = 5
-  char discriminator[8];
+  QString discriminator;
   // optional 'a_' + md5 hex digest (32 bytes) + null terminator = 35
-  char avatar[128];
+  QString avatar;
   // Rounded way up because I'm paranoid about games breaking from future changes in these sizes
 };
 
@@ -75,12 +83,12 @@ static std::atomic_bool GotErrorMessage { false };
 static std::atomic_bool WasJoinGame { false };
 static std::atomic_bool WasSpectateGame { false };
 static std::atomic_bool UpdatePresence { false };
-static char JoinGameSecret[256];
-static char SpectateGameSecret[256];
+static QString JoinGameSecret;
+static QString SpectateGameSecret;
 static int LastErrorCode { 0 };
-static char LastErrorMessage[256];
+static QString LastErrorMessage;
 static int LastDisconnectErrorCode { 0 };
-static char LastDisconnectErrorMessage[256];
+static QString LastDisconnectErrorMessage;
 static std::mutex PresenceMutex;
 static std::mutex HandlerMutex;
 static QueuedMessage QueuedPresence {};
@@ -152,65 +160,63 @@ static void Discord_UpdateConnection() {
     // reads
 
     for (;;) {
-      JsonDocument message;
-
-      if (!Connection->Read(message)) {
+      QJsonDocument json_document;
+      if (!Connection->Read(json_document)) {
         break;
       }
 
-      const char *evtName = GetStrMember(&message, "evt");
-      const char *nonce = GetStrMember(&message, "nonce");
+      const QJsonObject json_object = json_document.object();
+      const QString event_name = json_object["evt"_L1].toString();
+      const QString nonce = json_object["nonce"_L1].toString();
 
-      if (nonce) {
+      if (json_object.contains("nonce"_L1)) {
         // in responses only -- should use to match up response when needed.
 
-        if (evtName && strcmp(evtName, "ERROR") == 0) {
-          auto data = GetObjMember(&message, "data");
-          LastErrorCode = GetIntMember(data, "code");
-          StringCopy(LastErrorMessage, GetStrMember(data, "message", ""));
+        if (event_name == "ERROR"_L1) {
+          const QJsonObject data = json_object["data"_L1].toObject();
+          LastErrorCode = data["code"_L1].toInt();
+          LastErrorMessage = data["message"_L1].toString();
           GotErrorMessage.store(true);
         }
       }
       else {
         // should have evt == name of event, optional data
-        if (evtName == nullptr) {
+        if (event_name.isEmpty()) {
           continue;
         }
 
-        auto data = GetObjMember(&message, "data");
+        const QJsonObject data = json_object["data"_L1].toObject();
 
-        if (strcmp(evtName, "ACTIVITY_JOIN") == 0) {
-          auto secret = GetStrMember(data, "secret");
-          if (secret) {
-            StringCopy(JoinGameSecret, secret);
+        if (event_name == "ACTIVITY_JOIN"_L1) {
+          if (data.contains("secret"_L1)) {
+            JoinGameSecret = data["secret"_L1].toString();
             WasJoinGame.store(true);
           }
         }
-        else if (strcmp(evtName, "ACTIVITY_SPECTATE") == 0) {
-          auto secret = GetStrMember(data, "secret");
-          if (secret) {
-            StringCopy(SpectateGameSecret, secret);
+        else if (event_name == "ACTIVITY_SPECTATE"_L1) {
+          if (data.contains("secret"_L1)) {
+            SpectateGameSecret = data["secret"_L1].toString();
             WasSpectateGame.store(true);
           }
         }
-        else if (strcmp(evtName, "ACTIVITY_JOIN_REQUEST") == 0) {
-          auto user = GetObjMember(data, "user");
-          auto userId = GetStrMember(user, "id");
-          auto username = GetStrMember(user, "username");
-          auto avatar = GetStrMember(user, "avatar");
-          auto joinReq = JoinAskQueue.GetNextAddMessage();
-          if (userId && username && joinReq) {
-            StringCopy(joinReq->userId, userId);
-            StringCopy(joinReq->username, username);
-            auto discriminator = GetStrMember(user, "discriminator");
-            if (discriminator) {
-              StringCopy(joinReq->discriminator, discriminator);
+        else if (event_name == "ACTIVITY_JOIN_REQUEST"_L1) {
+          const QJsonObject user = data["user"_L1].toObject();
+          const QString userId = user["id"_L1].toString();
+          const QString username = user["username"_L1].toString();
+          const QString avatar = user["avatar"_L1].toString();
+          const auto joinReq = JoinAskQueue.GetNextAddMessage();
+          if (!userId.isEmpty() && !username.isEmpty() && joinReq) {
+            joinReq->userId = userId;
+            joinReq->username = username;
+            const QString discriminator = user["discriminator"_L1].toString();
+            if (!discriminator.isEmpty()) {
+              joinReq->discriminator =  discriminator;
             }
-            if (avatar) {
-              StringCopy(joinReq->avatar, avatar);
+            if (!avatar.isEmpty()) {
+              joinReq->avatar = avatar;
             }
             else {
-              joinReq->avatar[0] = 0;
+              joinReq->avatar.clear();
             }
             JoinAskQueue.CommitAdd();
           }
@@ -278,7 +284,7 @@ static bool DeregisterForEvent(const char *evtName) {
 
 }
 
-extern "C" void Discord_Initialize(const char *applicationId, DiscordEventHandlers *handlers, const int autoRegister) {
+extern "C" void Discord_Initialize(const QString &applicationId, DiscordEventHandlers *handlers, const int autoRegister) {
 
   IoThread = new (std::nothrow) IoThreadHolder();
   if (IoThread == nullptr) {
@@ -309,37 +315,38 @@ extern "C" void Discord_Initialize(const char *applicationId, DiscordEventHandle
   }
 
   Connection = RpcConnection::Create(applicationId);
-  Connection->onConnect = [](JsonDocument &readyMessage) {
+  Connection->onConnect = [](QJsonDocument &readyMessage) {
     Discord_UpdateHandlers(&QueuedHandlers);
     if (QueuedPresence.length > 0) {
       UpdatePresence.exchange(true);
       SignalIOActivity();
     }
-    auto data = GetObjMember(&readyMessage, "data");
-    auto user = GetObjMember(data, "user");
-    auto userId = GetStrMember(user, "id");
-    auto username = GetStrMember(user, "username");
-    auto avatar = GetStrMember(user, "avatar");
-    if (userId && username) {
-      StringCopy(connectedUser.userId, userId);
-      StringCopy(connectedUser.username, username);
-      auto discriminator = GetStrMember(user, "discriminator");
-      if (discriminator) {
-        StringCopy(connectedUser.discriminator, discriminator);
+    const QJsonValue json_object = readyMessage.object();
+    auto data = json_object["data"_L1].toObject();
+    auto user = data["user"_L1].toObject();
+    auto userId = user["id"_L1].toString();
+    auto username = user["username"_L1].toString();
+    auto avatar = user["avatar"_L1].toString();
+    if (!userId.isEmpty() && !username.isEmpty()) {
+      connectedUser.userId = userId;
+      connectedUser.username = username;
+      const QString discriminator = user["discriminator"_L1].toString();
+      if (!discriminator.isEmpty()) {
+        connectedUser.discriminator = discriminator;
       }
-      if (avatar) {
-        StringCopy(connectedUser.avatar, avatar);
+      if (!avatar.isEmpty()) {
+        connectedUser.avatar = avatar;
       }
       else {
-        connectedUser.avatar[0] = 0;
+        connectedUser = User();
       }
     }
     WasJustConnected.exchange(true);
     ReconnectTimeMs.reset();
   };
-  Connection->onDisconnect = [](int err, const char *message) {
+  Connection->onDisconnect = [](int err, QString &message) {
     LastDisconnectErrorCode = err;
-    StringCopy(LastDisconnectErrorMessage, message);
+    LastDisconnectErrorMessage = message;
     WasJustDisconnected.exchange(true);
     UpdateReconnectTime();
   };
@@ -368,7 +375,7 @@ extern "C" void Discord_Shutdown(void) {
 
 }
 
-extern "C" void Discord_UpdatePresence(const DiscordRichPresence *presence) {
+extern "C" void Discord_UpdatePresence(const DiscordRichPresence &presence) {
 
   {
     std::lock_guard<std::mutex> guard(PresenceMutex);
@@ -380,8 +387,8 @@ extern "C" void Discord_UpdatePresence(const DiscordRichPresence *presence) {
 
 }
 
-extern "C" void Discord_ClearPresence(void) {
-  Discord_UpdatePresence(nullptr);
+extern "C" void Discord_ClearPresence() {
+  Discord_UpdatePresence();
 }
 
 extern "C" void Discord_Respond(const char *userId, /* DISCORD_REPLY_ */ int reply) {

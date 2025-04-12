@@ -84,15 +84,17 @@ static void RegisterURL(const char *applicationId) {
 
 }
 
-void Discord_Register(const char *applicationId, const char *command) {
+void Discord_Register(const QString &applicationId, const char *command) {
+
+  const QByteArray applicationIdData = applicationId.toUtf8();
 
   if (command) {
-    RegisterCommand(applicationId, command);
+    RegisterCommand(applicationIdData.constData(), command);
   }
   else {
     // raii lite
     @autoreleasepool {
-      RegisterURL(applicationId);
+      RegisterURL(applicationIdData.constData());
     }
   }
 
